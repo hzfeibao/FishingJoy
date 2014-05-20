@@ -33,15 +33,18 @@ bool Weapon::init(CannonType type)
 }
 bool Weapon::shootTo(CCPoint touchLocation)
 {
+	CCLOG("Weapon::shootTo touchLocation.x: %f   y: %f", touchLocation.x , touchLocation.y);
     if(this->weaponStatus() != k_Weapon_Status_None){
-	return false;
+		return false;
     }else{
-	float distance = 180*(_cannon->getType()+1);
-	CCPoint normal = ccpNormalize(ccpSub(touchLocation, this->getParent()->convertToWorldSpace(this->getPosition())));
-	CCPoint verctor = ccpMult(normal, distance);
-	CCPoint target = ccpAdd(this->getPosition(), verctor);
-	_bullet->flyTo(target);
-	return true;
+		float distance = 180*(_cannon->getType()+1);
+		CCPoint normal = ccpNormalize(ccpSub(touchLocation, this->getParent()->convertToWorldSpace(this->getPosition())));
+		CCLOG("Weapon::shootTo normal.x: %f   y:%f" ,normal.x , normal.y);
+		CCPoint verctor = ccpMult(normal, distance);
+		CCPoint target = ccpAdd(this->getPosition(), verctor);
+		CCLOG("Weapon::shootTo target.x: %f   y:%f" ,target.x ,target.y);
+		_bullet->flyTo(target);
+		return true;
     }
 }
 void Weapon::aimAt(CCPoint target)

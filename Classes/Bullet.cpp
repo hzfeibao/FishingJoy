@@ -21,7 +21,8 @@ bool Bullet::init()
 }
 void Bullet::flyTo(CCPoint tartInWorldSpace)
 {
-    //
+	CCLOG("Bullet::flyTo target.x: %f   y: %f" ,tartInWorldSpace.x , tartInWorldSpace.y);
+    //点的转换和角度的计算
     CCPoint startInNodeSpace = CCPointZero;
     CCPoint startInWorldSpace = this->getParent()->convertToWorldSpace(startInNodeSpace);
     CCPoint targetInNodeSpace = this->getParent()->convertToNodeSpace(targetInNodeSpace);

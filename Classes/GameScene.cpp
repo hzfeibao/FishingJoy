@@ -48,8 +48,8 @@ bool GameScene::init()
         _menuLayer = MenuLayer::create();
         CC_SAFE_RETAIN(_menuLayer);
         
-	_touchLayer = TouchLayer::create();
-	this->addChild(_touchLayer);
+		_touchLayer = TouchLayer::create();
+		this->addChild(_touchLayer);
 
 	this->scheduleUpdate();
         return true;
@@ -111,6 +111,7 @@ void GameScene::cannonAimat(CCPoint target)
 }
 void GameScene::cannonShootTo(CCPoint target)
 {
+	CCLOG("GameScene::cannonShootTo target.x: %f   y: %f" ,target.x , target.y);
     _cannonLayer->shootTo(target);
 }
 void GameScene::update(float delta)

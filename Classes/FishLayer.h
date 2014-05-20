@@ -19,6 +19,7 @@ public:
     ~FishLayer();
 protected:
     void addFish(float dt);
+	void resetFish(Fish *fish);
 };
 
 #endif /* defined(__FishingJoy__FishLayer__) */
