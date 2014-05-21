@@ -25,7 +25,7 @@ void Bullet::flyTo(CCPoint tartInWorldSpace)
     //点的转换和角度的计算
     CCPoint startInNodeSpace = CCPointZero;
     CCPoint startInWorldSpace = this->getParent()->convertToWorldSpace(startInNodeSpace);
-    CCPoint targetInNodeSpace = this->getParent()->convertToNodeSpace(targetInNodeSpace);
+    CCPoint targetInNodeSpace = this->getParent()->convertToNodeSpace(tartInWorldSpace);//targetInNodeSpace
     float angle = ccpAngleSigned(ccpSub(targetInNodeSpace, startInWorldSpace), CCPointMake(0,1));
     this->setRotation(CC_RADIANS_TO_DEGREES(angle));
     this->setPosition(startInNodeSpace);
