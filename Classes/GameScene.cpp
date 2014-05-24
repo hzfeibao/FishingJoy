@@ -116,11 +116,14 @@ void GameScene::cannonShootTo(CCPoint target)
 }
 void GameScene::update(float delta)
 {
+    CCLOG("GameScene::update() begin");
     checkOutCollision();
+    CCLOG("GameScene::update() end");
 }
 //监测碰撞
 void GameScene::checkOutCollision()
 {
+    CCLOG("GameScene::checkOutCollision() begin");
     Weapon* weapon = _cannonLayer->getWeapon();
     if(weapon->weaponStatus() == k_Weapon_Status_Bullet){
 	bool flag = this->checkOutCollisionBetweenFishesAndBullet();
@@ -128,45 +131,68 @@ void GameScene::checkOutCollision()
 	    this->checkOutCollisionBetweenFishesAndFishingNet();
 	}
     }
+    CCLOG("GameScene::checkOutCollision() end");
 }
 bool GameScene::checkOutCollisionBetweenFishesAndBullet()
 {
+    CCLOG("GameScene::checkOutCollisionBetweenFishesAndBullet() begin");
     Weapon* weapon = _cannonLayer->getWeapon();
+    CCLOG("log 140");
     CCPoint bulletCollision = weapon->getCollisionPoint();
+    CCLOG("log 142");
     CCArray* fishes = _fishLayer->getFishes();
+    CCLOG("log 144");
     CCObject* iterator;
+    CCLOG("log 146");
     CCARRAY_FOREACH(fishes, iterator){
+	CCLOG("log 148");
 	Fish* fish = (Fish*)iterator;
+	CCLOG("log 150");
 	if(fish->isRunning()){
+	    CCLOG("log 152");
 	    CCRect fishCollisionArea = fish->getCollisionArea();
+	    CCLOG("log 154");
 	    bool isCollision = fishCollisionArea.containsPoint(bulletCollision);
+	    CCLOG("log 156");
 	    if(isCollision){
+		CCLOG("log 158");
 		weapon->end();
+		CCLOG("GameScene::checkOutCollisionBetweenFishesAndBullet() end true");
 		return true;
 	    }
 	}
     }
+    CCLOG("GameScene::checkOutCollisionBetweenFishesAndBullet() false");
     return false;
 }
 void GameScene::checkOutCollisionBetweenFishesAndFishingNet()
 {
+	
+	/**/
+	CCLOG("checkOutCollisionBetweenFishesAndFishingNet begin");
     Weapon* weapon = _cannonLayer->getWeapon();
     CCRect bulletCollision = weapon->getCollisionArea();
     CCArray* fishes = _fishLayer->getFishes();
     CCObject* iterator;
+    CCLOG("test before foreach");
     CCARRAY_FOREACH(fishes, iterator){
 	Fish* fish = (Fish*)iterator;
 	if(fish->isRunning()){
 	    CCRect fishCollisionArea = fish->getCollisionArea();
+	    CCLOG("before fishCollisionArea.intersectsRect");
 	    bool isCollision = fishCollisionArea.intersectsRect(bulletCollision);
+	    CCLOG("after fishCollisionArea.intersectsRect");
 	    if(isCollision){
 		this->fishWillBeCaught(fish);
+		CCLOG("after fishWillBeCaught");
 	    }
 	}
     }
+	CCLOG("checkOutCollisionBetweenFishesAndFishingNet end");
 }
 void GameScene::fishWillBeCaught(Fish* fish)
 {
+	CCLOG("fishWillBeCaught begin");
     int weaponType = _cannonLayer->getWeapon()->getCannonType();
     int fishType = fish->getType();
     float fish_percentage = STATIC_DATA_FLOAT(CCString::createWithFormat(STATIC_DATA_STRING("fish_percentage_format"),fishType)->getCString());
@@ -175,4 +201,5 @@ void GameScene::fishWillBeCaught(Fish* fish)
     if(CCRANDOM_0_1() < percentage){
 	fish->beCaught();
     }
+	CCLOG("fishWillBeCaught end");
 }

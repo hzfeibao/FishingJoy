@@ -42,6 +42,7 @@ CCRect Fish::getCollisionArea()
 }
 void Fish::beCaught()
 {
+	CCLOG("Fish::beCaught begin");
     this->stopActionByTag(k_Action_MoveTo);
     CCDelayTime* delayTime = CCDelayTime::create(1.0);
     CCCallFunc* callFunc = CCCallFunc::create(this, callfunc_selector(Fish::beCaught_CallFunc));
@@ -50,6 +51,7 @@ void Fish::beCaught()
     CCBlink* blink = CCBlink::create(1.0, 8);
     CCFiniteTimeAction *spawn = CCSpawn::create(seq, blink, NULL);
     this->runAction(spawn);
+	CCLOG("Fish::beCaught end");
 }
 void Fish::beCaught_CallFunc()
 {

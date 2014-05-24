@@ -29,6 +29,9 @@ bool Weapon::init(CannonType type)
     _fishingNet->setVisible(false);
     this->addChild(_fishingNet);
     
+    _particle = CCParticleSystemQuad::create(STATIC_DATA_STRING("star_particle"));
+    _particle->stopSystem();
+    this->addChild(_particle);
     return true;
 }
 bool Weapon::shootTo(CCPoint touchLocation)
@@ -56,17 +59,22 @@ int Weapon::weaponStatus()
     if(_bullet->isVisible()){
 	return k_Weapon_Status_Bullet;
     }else if(_fishingNet->isVisible()){
-	return k_Weapon_Status_Bullet;
+	return k_Weapon_Status_FishingNet;
     }
     return k_Weapon_Status_None;
 }
 void Weapon::end()
 {
     CCPoint pos = _bullet->getPosition();
+    CCLOG("weapon log 66");
     _bullet->end();
+    CCLOG("weapon log 68");
     _particle->setPosition(pos);
+    CCLOG("weapon log 70");
     _particle->resetSystem();
+    CCLOG("weapon log 72");
     _fishingNet->showAt(pos);
+    CCLOG("weapon log 74");
 }
 int Weapon::getCannonType()
 {
