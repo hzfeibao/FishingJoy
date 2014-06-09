@@ -38,6 +38,7 @@ public:
     //
     void cannonAimat(cocos2d::CCPoint target);
     void cannonShootTo(cocos2d::CCPoint target);
+    void scheduleTimeUp();
 
 protected:
     BackgroundLayer* _backgroundLayer;
@@ -60,6 +61,11 @@ protected:
     bool checkOutCollisionBetweenFishesAndBullet();
     void checkOutCollisionBetweenFishesAndFishingNet();
     void fishWillBeCaught(Fish* fish);
+
+    //数据相关
+    void alterGold(int delta);
+
+    void onEnterTransitionDidFinish();
 };
 
 #endif /* defined(__FishingJoy__GameScene__) */

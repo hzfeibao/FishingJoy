@@ -1,76 +1,91 @@
 //
-//  GameScene.cpp
-//  FishingJoy
-//
-//  Created by Ringo_D on 12-9-8.
-//
-//
 
 #include "GameScene.h"
 #include "StaticData.h"
 #include "FishingJoyData.h"
+#include "PersonalAudioEngine.h"
 USING_NS_CC;
 //todo 预载入资源，实现StartScene后将其删除
 void GameScene::preloadResources()
 {
-    CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("fishingjoy_resource.plist");
-    
-    int frameCount = STATIC_DATA_INT("fish_frame_count");
-    for (int type = k_Fish_Type_Red; type < k_Fish_Type_Count; type++) {
-        CCArray* spriteFrames = CCArray::createWithCapacity(frameCount);
-        for(int i = 0;i < frameCount;i++){
-            CCString* filename = CCString::createWithFormat(STATIC_DATA_STRING("fish_frame_name_format"),type,i);
-            CCSpriteFrame* spriteFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(filename->getCString());
-            spriteFrames->addObject(spriteFrame);
-        }
-        CCAnimation* fishAnimation = CCAnimation::createWithSpriteFrames(spriteFrames);
-        fishAnimation->setDelayPerUnit(STATIC_DATA_FLOAT("fish_frame_delay"));
-        CCString* animationName = CCString::createWithFormat(STATIC_DATA_STRING("fish_animation"), type);
-        CCAnimationCache::sharedAnimationCache()->addAnimation(fishAnimation, animationName->getCString());
+CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("fishingjoy_resource.plist");
+
+int frameCount = STATIC_DATA_INT("fish_frame_count");
+for (int type = k_Fish_Type_Red; type < k_Fish_Type_Count; type++) {
+    CCArray* spriteFrames = CCArray::createWithCapacity(frameCount);
+    for(int i = 0;i < frameCount;i++){
+	CCString* filename = CCString::createWithFormat(STATIC_DATA_STRING("fish_frame_name_format"),type,i);
+	CCSpriteFrame* spriteFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(filename->getCString());
+	spriteFrames->addObject(spriteFrame);
     }
+    CCAnimation* fishAnimation = CCAnimation::createWithSpriteFrames(spriteFrames);
+    fishAnimation->setDelayPerUnit(STATIC_DATA_FLOAT("fish_frame_delay"));
+    CCString* animationName = CCString::createWithFormat(STATIC_DATA_STRING("fish_animation"), type);
+    CCAnimationCache::sharedAnimationCache()->addAnimation(fishAnimation, animationName->getCString());
+}
+
+FishingJoyData::sharedFishingJoyData();
+PersonalAudioEngine::sahredEngine();
+}
+void GameScene::onEnterTransitionDidFinish()
+{
+CCScene::onEnterTransitionDidFinish();
+PersonalAudioEngine::sharedEngine()->playBackgroundMusic(STATIC_DATA_STRING("bg_music"), true);
 }
 bool GameScene::init()
 {
-    preloadResources();
-    if(CCScene::init()){
-        _backgroundLayer = BackgroundLayer::create();
-        this->addChild(_backgroundLayer);
-        
-        _fishLayer = FishLayer::create();
-        this->addChild(_fishLayer);
-        
-        _cannonLayer = CannonLayer::create();
-        this->addChild(_cannonLayer);
-        
-        _panelLayer = PanelLayer::create();
-        this->addChild(_panelLayer);
+preloadResources();
+if(CCScene::init()){
+    _backgroundLayer = BackgroundLayer::create();
+    this->addChild(_backgroundLayer);
+    
+    _fishLayer = FishLayer::create();
+    this->addChild(_fishLayer);
+    
+    _cannonLayer = CannonLayer::create();
+    this->addChild(_cannonLayer);
+    
+    _panelLayer = PanelLayer::create();
+    this->addChild(_panelLayer);
 
-        _menuLayer = MenuLayer::create();
-        CC_SAFE_RETAIN(_menuLayer);
-        
-		_touchLayer = TouchLayer::create();
-		this->addChild(_touchLayer);
+    _menuLayer = MenuLayer::create();
+    CC_SAFE_RETAIN(_menuLayer);
+    
+     _touchLayer = TouchLayer::create();
+    this->addChild(_touchLayer);
 
-	this->scheduleUpdate();
-        return true;
-    }
-    return false;
+    _panelLayer->getGoldCounterLayer()->setNumber(FishingJoyData::sharedFishingJoyData()->getGold());
+    _menuLayer->setSoundAndMusicVolume(FishingJoyData::sharedFishingJoyData()->getSoundVolume(), FishingJoyData::sharedFishingJoyData()->getMusicVolume());
+
+    this->scheduleUpdate();
+    return true;
+}
+return false;
 }
 void GameScene::pause()
 {
-    this->operateAllSchedulerAndActions(this, k_Operate_Pause);
-    this->addChild(_menuLayer);
+    PersonalAudioEngins::sharedEngine()->pauseBackgroundMusic();
+    PersonalAudioEngine::sharedEngine()->playEffect(STATIC_DATA_STRING("sound_button"));
+this->operateAllSchedulerAndActions(this, k_Operate_Pause);
+    _touchLayer->setTouchEnabled(false);
+this->addChild(_menuLayer);
 }
 void GameScene::resume()
 {
     this->operateAllSchedulerAndActions(this, k_Operate_Resume);
+    PersonalAudioEngine::sharedEngine()->resumeBackGroundMusic();
     this->removeChild(_menuLayer, false);
+    _touchLayer->setTouchEnabled(true);
 }
 void GameScene::sound()
 {
+    bool flag = FishingJoyData::sharedFishingJoyData()->getSoundVolume() > 0;
+    PersonalAudioEngine::sharedEngine()->setEffectsVolume(!flag);
 }
 void GameScene::music()
 {
+    bool flag = FishingJoyData::sharedFishingJoyData()->getMusicVolume()>0;
+    PersonalAudioEngine::sharedEngine()->setBackgroundMusicVolume(!flag);
 }
 void GameScene::reset()
 {
@@ -112,7 +127,14 @@ void GameScene::cannonAimat(CCPoint target)
 void GameScene::cannonShootTo(CCPoint target)
 {
 	CCLOG("GameScene::cannonShootTo target.x: %f   y: %f" ,target.x , target.y);
-    _cannonLayer->shootTo(target);
+    int type = _cannonLayer->getWeapon()->getCannon()->getType();
+    int cost = (type+1)*1;
+    int currentGold = FishingJoyData::sharedFishingJoyData()->getGold();
+    if(currentGold >= cost && _cannonLayer->shootTo(target)){
+	PersonalAudioEngine::sharedEngine()->playEffect(STATIC_DATA_STRING("sound_shot"));
+	this->alterGold(-cost);
+    }
+    //_cannonLayer->shootTo(target);
 }
 void GameScene::update(float delta)
 {
@@ -202,4 +224,15 @@ void GameScene::fishWillBeCaught(Fish* fish)
 	fish->beCaught();
     }
 	CCLOG("fishWillBeCaught end");
+}
+
+void GameScene::alterGold(int delta)
+{
+    FishingJoyData::sharedFishingJoyData()->alterGold(delta);
+    _panelLayer->getGoldCounterLayer()->setNumber(FishingJoyData::sharedFishingJoyData()->getGold());
+}
+
+void GameScene::scheduleTimeUp()
+{
+    this->alterGold(STATIC_DATA_INT("recovery_gold"));
 }
