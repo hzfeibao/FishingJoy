@@ -18,7 +18,11 @@ SOURCES = main.cpp \
 	../Classes/GameScene.cpp\
 	../Classes/PanelLayer.cpp\
 	../Classes/Weapon.cpp\
-	../Classes/TouchLayer.cpp
+	../Classes/TouchLayer.cpp\
+	../Classes/PanelLayer.cpp\
+	../Classes/Counter.cpp\
+	../Classes/GoldCounterLayer.cpp\
+	../Classes/PersonalAudioEngine.cpp
 
 COCOS_ROOT = ../../..
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk
